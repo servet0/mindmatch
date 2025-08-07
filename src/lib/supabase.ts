@@ -1,19 +1,30 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Supabase environment variables are missing! Please check your .env.local file.');
+// Build zamanında environment variables kontrol et
+function createSupabaseClient() {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    // Build zamanında warning ver ama error fırlatma
+    if (typeof window === 'undefined') {
+      console.warn('Supabase environment variables are missing during build');
+      // Dummy client return et build için
+      return createClient('https://dummy.supabase.co', 'dummy-key');
+    }
+    throw new Error('Supabase environment variables are missing! Please check your .env.local file.');
+  }
+
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    realtime: {
+      params: {
+        eventsPerSecond: 10,
+      },
+    },
+  });
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  realtime: {
-    params: {
-      eventsPerSecond: 10,
-    },
-  },
-});
+export const supabase = createSupabaseClient();
 
 // Veritabanı türleri
 export interface Player {
