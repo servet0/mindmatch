@@ -32,7 +32,7 @@ export function HomePage() {
       if (actionType === 'create') {
         const room = await createRoom(player.id);
         actions.setRoom(room);
-        actions.updateRoomPlayers();
+        await actions.updateRoomPlayers();
       } else {
         if (!roomCode.trim()) {
           setError('Lütfen oda kodunu giriniz');
@@ -41,7 +41,7 @@ export function HomePage() {
         }
         const room = await joinRoom(roomCode.trim().toUpperCase(), player.id);
         actions.setRoom(room);
-        actions.updateRoomPlayers();
+        await actions.updateRoomPlayers();
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Bir hata oluştu');

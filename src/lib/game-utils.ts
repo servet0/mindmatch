@@ -18,7 +18,10 @@ export async function createPlayer(nickname: string) {
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    throw new Error(`Oyuncu oluşturulamadı: ${error.message}`);
+  }
+  
   return data;
 }
 
@@ -31,6 +34,7 @@ export async function createRoom(playerId: string) {
   // Benzersiz oda kodu bul
   do {
     roomCode = generateRoomCode();
+    
     const { data: existingRoom } = await supabase
       .from('rooms')
       .select('id')
@@ -55,7 +59,9 @@ export async function createRoom(playerId: string) {
     .select()
     .single();
 
-  if (roomError) throw roomError;
+  if (roomError) {
+    throw new Error(`Oda oluşturulamadı: ${roomError.message}`);
+  }
 
   // Oda yaratıcısını odaya ekle
   const { error: playerError } = await supabase
@@ -66,7 +72,9 @@ export async function createRoom(playerId: string) {
       score: 0
     }]);
 
-  if (playerError) throw playerError;
+  if (playerError) {
+    throw new Error(`Oyuncu odaya eklenemedi: ${playerError.message}`);
+  }
 
   return room;
 }
