@@ -78,15 +78,12 @@ const GameContext = createContext<{
     setPlayer: (player: Player) => void;
     setRoom: (room: Room) => void;
     updateRoomPlayers: () => Promise<void>;
-    startTimer: (duration: number) => void;
-    stopTimer: () => void;
     subscribeToRoom: (roomId: string) => () => void;
     resetGame: () => void;
   };
 } | null>(null);
 
-// Timer ref
-let timerRef: NodeJS.Timeout | null = null;
+
 
 // Provider component
 export function GameProvider({ children }: { children: ReactNode }) {
@@ -127,33 +124,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       }
     },
 
-    startTimer: (duration: number) => {
-      let currentTime = duration;
-      dispatch({ type: 'SET_TIME_LEFT', payload: currentTime });
-      
-      if (timerRef) {
-        clearInterval(timerRef);
-      }
 
-      timerRef = setInterval(() => {
-        currentTime -= 1;
-        dispatch({ type: 'SET_TIME_LEFT', payload: currentTime });
-        
-        if (currentTime <= 0) {
-          if (timerRef) {
-            clearInterval(timerRef);
-            timerRef = null;
-          }
-        }
-      }, 1000);
-    },
-
-    stopTimer: () => {
-      if (timerRef) {
-        clearInterval(timerRef);
-        timerRef = null;
-      }
-    },
 
     subscribeToRoom: (roomId: string) => {
       // Room değişikliklerini dinle
@@ -197,11 +168,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
             if (payload.new) {
               dispatch({ type: 'SET_CURRENT_ROUND', payload: payload.new as GameRound });
               
-              // Yeni round başladıysa timer başlat
-              if ((payload.new as GameRound).status === 'active') {
-                dispatch({ type: 'SET_GAME_PHASE', payload: 'answering' });
-                actions.startTimer(10);
-              }
+                          // Yeni round başladıysa oyun fazını değiştir
+            if ((payload.new as GameRound).status === 'active') {
+              dispatch({ type: 'SET_GAME_PHASE', payload: 'answering' });
+            }
             }
           }
         )
@@ -236,24 +206,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
       // Cleanup fonksiyonu
       return () => {
         roomSubscription.unsubscribe();
-        actions.stopTimer();
       };
     },
 
     resetGame: () => {
-      actions.stopTimer();
       dispatch({ type: 'RESET_GAME' });
     },
   };
 
-  // Timer temizleme
-  useEffect(() => {
-    return () => {
-      if (timerRef) {
-        clearInterval(timerRef);
-      }
-    };
-  }, []);
+
 
   return (
     <GameContext.Provider value={{ state, dispatch, actions }}>

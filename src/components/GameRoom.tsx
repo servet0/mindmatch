@@ -6,12 +6,45 @@ import { startNewRound, submitAnswer, calculateRoundResults, finishGame } from '
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Copy, Crown, Timer, Users, Trophy, RotateCcw } from 'lucide-react';
+import { Copy, Crown, Users, Trophy, RotateCcw, Home } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
-export function GameRoom() {
+interface GameRoomProps {
+  roomId?: string;
+}
+
+export function GameRoom({ roomId }: GameRoomProps = {}) {
   const { state, actions, dispatch } = useGame();
   const [answer, setAnswer] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  // Player'ı localStorage'dan yükle
+  useEffect(() => {
+    const savedPlayer = localStorage.getItem('mindmatch_player');
+    if (savedPlayer && !state.currentPlayer) {
+      const player = JSON.parse(savedPlayer);
+      actions.setPlayer(player);
+    }
+  }, [state.currentPlayer, actions]);
+
+  // Room ID'den oda bilgisini yükle
+  useEffect(() => {
+    if (roomId && state.currentPlayer && !state.currentRoom) {
+      // Room bilgisini yükle
+      const loadRoom = async () => {
+        const { data: room } = await supabase
+          .from('rooms')
+          .select('*')
+          .eq('id', roomId)
+          .single();
+        
+        if (room) {
+          actions.setRoom(room);
+        }
+      };
+      loadRoom();
+    }
+  }, [roomId, state.currentPlayer, state.currentRoom, actions]);
 
   // Oda subscription
   useEffect(() => {
@@ -75,20 +108,13 @@ export function GameRoom() {
     }
   };
 
-  // Yeni oyun
-  const handleNewGame = () => {
-    actions.resetGame();
+  // Ana sayfaya dön
+  const handleGoHome = () => {
+    localStorage.removeItem('mindmatch_player');
+    window.location.href = '/';
   };
 
-  // Timer bitiminde otomatik işlemler
-  useEffect(() => {
-    if (state.timeLeft === 0 && state.gamePhase === 'answering') {
-      // Eğer cevap verilmemişse boş cevap gönder
-      if (!state.answers.find(a => a.player_id === state.currentPlayer?.id)) {
-        handleSubmitAnswer({ preventDefault: () => {} } as React.FormEvent);
-      }
-    }
-  }, [state.timeLeft, state.gamePhase, state.answers, state.currentPlayer?.id, handleSubmitAnswer]);
+
 
   // Round sonuçlarını kontrol et
   useEffect(() => {
@@ -177,18 +203,21 @@ export function GameRoom() {
                     <p className="text-white/60 text-sm">
                       İkinci oyuncu bekleniyor...
                     </p>
+                    <p className="text-white/40 text-xs mt-2">
+                      Oda Kodu: {state.currentRoom?.room_code}
+                    </p>
                   </div>
                 )}
               </CardContent>
             </Card>
 
-            {/* Yeni oyun butonu */}
+            {/* Ana sayfaya dön butonu */}
             <Button
               variant="game"
-              onClick={handleNewGame}
+              onClick={handleGoHome}
               className="w-full gap-2"
             >
-              <RotateCcw className="w-4 h-4" />
+              <Home className="w-4 h-4" />
               Ana Sayfaya Dön
             </Button>
           </div>
@@ -239,16 +268,10 @@ export function GameRoom() {
             {state.gamePhase === 'answering' && state.currentRound && (
               <Card className="card-gradient border-white/20 text-white">
                 <CardHeader className="text-center pb-4">
-                  <div className="flex items-center justify-center gap-3 mb-4">
-                    <Timer className={`w-8 h-8 ${state.timeLeft <= 3 ? 'timer-pulse text-red-400' : 'text-white'}`} />
-                    <span className={`text-4xl font-bold ${state.timeLeft <= 3 ? 'text-red-400' : 'text-white'}`}>
-                      {state.timeLeft}
-                    </span>
-                  </div>
-                  <CardTitle className="text-2xl text-white mb-2">
+                  <CardTitle className="text-3xl text-white mb-4">
                     Kategori: {state.currentRound.category_name}
                   </CardTitle>
-                  <p className="text-white/70">
+                  <p className="text-white/70 text-lg">
                     Bu kategoriye uygun bir kelime yazın!
                   </p>
                 </CardHeader>
@@ -260,7 +283,7 @@ export function GameRoom() {
                       value={answer}
                       onChange={(e) => setAnswer(e.target.value)}
                       className="bg-white/10 border-white/20 text-white placeholder:text-white/50 text-center text-lg"
-                      disabled={submitting || state.timeLeft === 0}
+                      disabled={submitting}
                       autoFocus
                     />
                     <Button
@@ -268,7 +291,7 @@ export function GameRoom() {
                       variant="game"
                       size="lg"
                       className="w-full text-lg font-semibold"
-                      disabled={submitting || !answer.trim() || state.timeLeft === 0}
+                      disabled={submitting || !answer.trim()}
                     >
                       {submitting ? 'Gönderiliyor...' : 'Cevabı Gönder'}
                     </Button>
@@ -281,13 +304,18 @@ export function GameRoom() {
             {state.gamePhase === 'waiting' && (
               <Card className="card-gradient border-white/20 text-white text-center">
                 <CardContent className="py-12">
-                  <Timer className="w-16 h-16 text-white/60 mx-auto mb-4 animate-spin" />
+                  <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-8 h-8 text-white animate-pulse" />
+                  </div>
                   <h3 className="text-xl font-semibold mb-2 text-white">
-                    Diğer Oyuncu Bekleniyor
+                    Cevabınız Alındı!
                   </h3>
                   <p className="text-white/70">
-                    Diğer oyuncunun cevabını bekleyin.
+                    Diğer oyuncunun cevabını bekliyoruz...
                   </p>
+                  <div className="mt-4 bg-white/10 rounded-lg p-3">
+                    <p className="text-white/80">Cevabınız: &quot;{state.answers.find(a => a.player_id === state.currentPlayer?.id)?.answer || answer}&quot;</p>
+                  </div>
                 </CardContent>
               </Card>
             )}
@@ -394,11 +422,11 @@ export function GameRoom() {
                     <Button
                       variant="game"
                       size="lg"
-                      onClick={handleNewGame}
+                      onClick={handleGoHome}
                       className="w-full text-lg font-semibold gap-2"
                     >
-                      <RotateCcw className="w-5 h-5" />
-                      Yeni Oyun
+                      <Home className="w-5 h-5" />
+                      Ana Sayfaya Dön
                     </Button>
                   </div>
                 </CardContent>

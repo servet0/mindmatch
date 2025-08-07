@@ -1,16 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { useGame } from '@/contexts/GameContext';
+import { useRouter } from 'next/navigation';
 import { createPlayer, createRoom, joinRoom } from '@/lib/game-utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { GameRoom } from '@/components/GameRoom';
 import { Users, GamepadIcon, Zap } from 'lucide-react';
 
 export function HomePage() {
-  const { state, actions } = useGame();
+  const router = useRouter();
   const [nickname, setNickname] = useState('');
   const [roomCode, setRoomCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,12 +26,14 @@ export function HomePage() {
 
     try {
       const player = await createPlayer(nickname.trim());
-      actions.setPlayer(player);
+      
+      // Player bilgisini localStorage'a kaydet
+      localStorage.setItem('mindmatch_player', JSON.stringify(player));
 
       if (actionType === 'create') {
         const room = await createRoom(player.id);
-        actions.setRoom(room);
-        await actions.updateRoomPlayers();
+        // Oda sayfasına yönlendir
+        router.push(`/room/${room.id}`);
       } else {
         if (!roomCode.trim()) {
           setError('Lütfen oda kodunu giriniz');
@@ -40,8 +41,8 @@ export function HomePage() {
           return;
         }
         const room = await joinRoom(roomCode.trim().toUpperCase(), player.id);
-        actions.setRoom(room);
-        await actions.updateRoomPlayers();
+        // Oda sayfasına yönlendir
+        router.push(`/room/${room.id}`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Bir hata oluştu');
@@ -50,10 +51,7 @@ export function HomePage() {
     }
   };
 
-  // Eğer oyuncu ve oda varsa, oyun odasını göster
-  if (state.currentPlayer && state.currentRoom) {
-    return <GameRoom />;
-  }
+
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -64,7 +62,7 @@ export function HomePage() {
             Mind<span className="text-yellow-400">Match</span>
           </h1>
           <p className="text-xl text-white/80 max-w-2xl mx-auto">
-            İki kişilik kelime tahmin oyunu! Aynı kategori, 10 saniye, sonsuz eğlence.
+            İki kişilik kelime tahmin oyunu! Aynı kategori, gerçek zamanlı eğlence.
           </p>
         </div>
 
@@ -74,9 +72,9 @@ export function HomePage() {
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <Zap className="w-8 h-8 text-white" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">Hızlı Oyun</h3>
+            <h3 className="text-lg font-semibold text-white mb-2">Gerçek Zamanlı</h3>
             <p className="text-white/70 text-sm">
-              Her round sadece 10 saniye. Hızlı düşün, hızlı yaz!
+              Anlık eşleşme! Karşı taraf yazdığında hemen devam eder.
             </p>
           </div>
           <div className="text-center">
@@ -200,7 +198,7 @@ export function HomePage() {
         {/* Alt bilgi */}
         <div className="text-center mt-12 text-white/60 text-sm">
           <p>
-            Oyun kuralları: Her roundda aynı kategori gösterilir. 10 saniye içinde bir kelime yazın.
+            Oyun kuralları: Her roundda aynı kategori gösterilir. Bir kelime yazın ve gönderin.
             <br />
             Aynı kelime yazarsanız her ikiniz 2 puan, farklı kelime yazarsanız 1 puan alırsınız.
           </p>
