@@ -166,12 +166,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
           },
           (payload) => {
             if (payload.new) {
-              dispatch({ type: 'SET_CURRENT_ROUND', payload: payload.new as GameRound });
+              const newRound = payload.new as GameRound;
+              dispatch({ type: 'SET_CURRENT_ROUND', payload: newRound });
               
-                          // Yeni round başladıysa oyun fazını değiştir
-            if ((payload.new as GameRound).status === 'active') {
-              dispatch({ type: 'SET_GAME_PHASE', payload: 'answering' });
-            }
+              // Round durumuna göre oyun fazını değiştir
+              if (newRound.status === 'active') {
+                dispatch({ type: 'SET_GAME_PHASE', payload: 'answering' });
+                // Yeni round başladığında cevapları temizle
+                dispatch({ type: 'SET_ANSWERS', payload: [] });
+              } else if (newRound.status === 'completed') {
+                dispatch({ type: 'SET_GAME_PHASE', payload: 'results' });
+              }
             }
           }
         )
@@ -183,7 +188,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
             table: 'player_answers',
             filter: `room_id=eq.${roomId}`,
           },
-          async () => {
+          async (payload) => {
             // Cevapları güncelle
             if (state.currentRound) {
               const { data: answers } = await supabase
@@ -198,6 +203,22 @@ export function GameProvider({ children }: { children: ReactNode }) {
                 .eq('round_id', state.currentRound.id);
 
               dispatch({ type: 'SET_ANSWERS', payload: answers || [] });
+              
+              // Eğer 2 cevap varsa ve round hala aktifse, otomatik olarak round'u tamamla
+              if (answers && answers.length === 2) {
+                const { data: currentRound } = await supabase
+                  .from('game_rounds')
+                  .select('status')
+                  .eq('id', state.currentRound.id)
+                  .single();
+                
+                if (currentRound && currentRound.status === 'active') {
+                  // Round'u tamamlama işlemini tetikle
+                  setTimeout(() => {
+                    dispatch({ type: 'SET_GAME_PHASE', payload: 'results' });
+                  }, 500);
+                }
+              }
             }
           }
         )

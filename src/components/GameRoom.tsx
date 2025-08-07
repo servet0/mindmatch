@@ -40,11 +40,69 @@ export function GameRoom({ roomId }: GameRoomProps = {}) {
         
         if (room) {
           actions.setRoom(room);
+          // Room players'ı da yükle
+          await actions.updateRoomPlayers();
+          
+          // Aktif round var mı kontrol et
+          const { data: activeRound } = await supabase
+            .from('game_rounds')
+            .select('*')
+            .eq('room_id', room.id)
+            .eq('status', 'active')
+            .single();
+          
+          if (activeRound) {
+            dispatch({ type: 'SET_CURRENT_ROUND', payload: activeRound });
+            dispatch({ type: 'SET_GAME_PHASE', payload: 'answering' });
+            
+            // Bu round'daki cevapları yükle
+            const { data: answers } = await supabase
+              .from('player_answers')
+              .select(`
+                *,
+                players:player_id (
+                  id,
+                  nickname
+                )
+              `)
+              .eq('round_id', activeRound.id);
+            
+            dispatch({ type: 'SET_ANSWERS', payload: answers || [] });
+          } else {
+            // Completed round var mı kontrol et
+            const { data: completedRound } = await supabase
+              .from('game_rounds')
+              .select('*')
+              .eq('room_id', room.id)
+              .eq('status', 'completed')
+              .order('round_number', { ascending: false })
+              .limit(1)
+              .single();
+            
+            if (completedRound) {
+              dispatch({ type: 'SET_CURRENT_ROUND', payload: completedRound });
+              dispatch({ type: 'SET_GAME_PHASE', payload: 'results' });
+              
+              // Son round'un cevaplarını yükle
+              const { data: answers } = await supabase
+                .from('player_answers')
+                .select(`
+                  *,
+                  players:player_id (
+                    id,
+                    nickname
+                  )
+                `)
+                .eq('round_id', completedRound.id);
+              
+              dispatch({ type: 'SET_ANSWERS', payload: answers || [] });
+            }
+          }
         }
       };
       loadRoom();
     }
-  }, [roomId, state.currentPlayer, state.currentRoom, actions]);
+  }, [roomId, state.currentPlayer, state.currentRoom, actions, dispatch]);
 
   // Oda subscription
   useEffect(() => {
@@ -119,10 +177,21 @@ export function GameRoom({ roomId }: GameRoomProps = {}) {
   // Round sonuçlarını kontrol et
   useEffect(() => {
     if (state.answers.length === 2 && state.currentRound?.status === 'active') {
-      calculateRoundResults(state.currentRound.id);
-      dispatch({ type: 'SET_GAME_PHASE', payload: 'results' });
+      // Sonuçları hesapla
+      const processResults = async () => {
+        try {
+          await calculateRoundResults(state.currentRound!.id);
+          // Room players'ı güncelle
+          await actions.updateRoomPlayers();
+          dispatch({ type: 'SET_GAME_PHASE', payload: 'results' });
+        } catch (error) {
+          console.error('Results calculation error:', error);
+        }
+      };
+      
+      processResults();
     }
-  }, [state.answers.length, state.currentRound?.status, state.currentRound?.id, dispatch]);
+  }, [state.answers.length, state.currentRound?.status, state.currentRound?.id, dispatch, actions]);
 
   const isRoomCreator = state.currentRoom?.created_by === state.currentPlayer?.id;
 
@@ -371,16 +440,25 @@ export function GameRoom({ roomId }: GameRoomProps = {}) {
                     )}
                   </div>
 
-                  <Button
-                    variant="game"
-                    size="lg"
-                    onClick={handleNextRound}
-                    className="w-full text-lg font-semibold"
-                  >
-                    {state.currentRoom!.current_round >= state.currentRoom!.max_rounds
-                      ? 'Oyunu Bitir'
-                      : 'Sonraki Round'}
-                  </Button>
+                  {isRoomCreator ? (
+                    <Button
+                      variant="game"
+                      size="lg"
+                      onClick={handleNextRound}
+                      className="w-full text-lg font-semibold"
+                    >
+                      {state.currentRoom!.current_round >= state.currentRoom!.max_rounds
+                        ? 'Oyunu Bitir'
+                        : 'Sonraki Round'}
+                    </Button>
+                  ) : (
+                    <div className="text-center">
+                      <p className="text-white/70 mb-4">
+                        Oda sahibinin sonraki round'u başlatmasını bekleyin...
+                      </p>
+                      <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto"></div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}

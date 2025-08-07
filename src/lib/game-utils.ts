@@ -269,6 +269,23 @@ export async function calculateRoundResults(roundId: string) {
     })
     .eq('id', roundId);
 
+  // Room'un current_round'unu güncelle (sonraki round için hazırlık)
+  const { data: round } = await supabase
+    .from('game_rounds')
+    .select('room_id, round_number')
+    .eq('id', roundId)
+    .single();
+
+  if (round) {
+    await supabase
+      .from('rooms')
+      .update({
+        current_round: round.round_number,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', round.room_id);
+  }
+
   return {
     answers: [
       { ...answer1, points_earned: points1 },
