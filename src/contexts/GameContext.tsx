@@ -140,7 +140,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
           },
           (payload) => {
             if (payload.new) {
-              dispatch({ type: 'SET_ROOM', payload: payload.new as Room });
+              const newRoom = payload.new as Room;
+              dispatch({ type: 'SET_ROOM', payload: newRoom });
+              
+              // Room status değişikliklerini kontrol et
+              if (newRoom.status === 'finished') {
+                dispatch({ type: 'SET_GAME_PHASE', payload: 'finished' });
+              }
             }
           }
         )

@@ -17,6 +17,7 @@ export function GameRoom({ roomId }: GameRoomProps = {}) {
   const { state, actions, dispatch } = useGame();
   const [answer, setAnswer] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [autoNextCountdown, setAutoNextCountdown] = useState(0);
 
   // Player'ı localStorage'dan yükle
   useEffect(() => {
@@ -153,7 +154,7 @@ export function GameRoom({ roomId }: GameRoomProps = {}) {
   }, [state.currentRound, state.currentPlayer, state.currentRoom, answer, dispatch]);
 
   // Sonraki round
-  const handleNextRound = async () => {
+  const handleNextRound = useCallback(async () => {
     if (!state.currentRoom) return;
 
     const nextRoundNumber = state.currentRoom.current_round + 1;
@@ -162,9 +163,15 @@ export function GameRoom({ roomId }: GameRoomProps = {}) {
       await finishGame(state.currentRoom.id);
       dispatch({ type: 'SET_GAME_PHASE', payload: 'finished' });
     } else {
-      await startNewRound(state.currentRoom.id, nextRoundNumber);
+      try {
+        await startNewRound(state.currentRoom.id, nextRoundNumber);
+        // Round başlatıldıktan sonra oyun fazını değiştir
+        dispatch({ type: 'SET_GAME_PHASE', payload: 'answering' });
+      } catch (error) {
+        console.error('Round başlatılamadı:', error);
+      }
     }
-  };
+  }, [state.currentRoom, dispatch]);
 
   // Ana sayfaya dön
   const handleGoHome = () => {
@@ -184,6 +191,21 @@ export function GameRoom({ roomId }: GameRoomProps = {}) {
           // Room players'ı güncelle
           await actions.updateRoomPlayers();
           dispatch({ type: 'SET_GAME_PHASE', payload: 'results' });
+          
+          // Oda sahibiyse 3 saniye sonra otomatik sonraki round'a geç
+          if (isRoomCreator) {
+            setAutoNextCountdown(3);
+            const countdownInterval = setInterval(() => {
+              setAutoNextCountdown((prev) => {
+                if (prev <= 1) {
+                  clearInterval(countdownInterval);
+                  handleNextRound();
+                  return 0;
+                }
+                return prev - 1;
+              });
+            }, 1000);
+          }
         } catch (error) {
           console.error('Results calculation error:', error);
         }
@@ -191,7 +213,7 @@ export function GameRoom({ roomId }: GameRoomProps = {}) {
       
       processResults();
     }
-  }, [state.answers.length, state.currentRound?.status, state.currentRound?.id, dispatch, actions]);
+  }, [state.answers.length, state.currentRound?.status, state.currentRound?.id, dispatch, actions, isRoomCreator, handleNextRound]);
 
   const isRoomCreator = state.currentRoom?.created_by === state.currentPlayer?.id;
 
@@ -440,25 +462,23 @@ export function GameRoom({ roomId }: GameRoomProps = {}) {
                     )}
                   </div>
 
-                  {isRoomCreator ? (
-                    <Button
-                      variant="game"
-                      size="lg"
-                      onClick={handleNextRound}
-                      className="w-full text-lg font-semibold"
-                    >
-                      {state.currentRoom!.current_round >= state.currentRoom!.max_rounds
-                        ? 'Oyunu Bitir'
-                        : 'Sonraki Round'}
-                    </Button>
-                  ) : (
-                    <div className="text-center">
-                      <p className="text-white/70 mb-4">
-                        Oda sahibinin sonraki round&apos;u başlatmasını bekleyin...
-                      </p>
-                      <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto"></div>
-                    </div>
-                  )}
+                  <Button
+                    variant="game"
+                    size="lg"
+                    onClick={handleNextRound}
+                    className="w-full text-lg font-semibold"
+                    disabled={!isRoomCreator || autoNextCountdown > 0}
+                  >
+                    {autoNextCountdown > 0 ? 
+                      `Sonraki round ${autoNextCountdown} saniye içinde başlayacak...` :
+                      (!isRoomCreator ? 
+                        'Oda sahibi sonraki round&apos;u başlatacak...' :
+                        (state.currentRoom!.current_round >= state.currentRoom!.max_rounds
+                          ? 'Oyunu Bitir'
+                          : 'Sonraki Round')
+                      )
+                    }
+                  </Button>
                 </CardContent>
               </Card>
             )}
