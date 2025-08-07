@@ -19,7 +19,7 @@ export function GameRoom() {
 
     const unsubscribe = actions.subscribeToRoom(state.currentRoom.id);
     return unsubscribe;
-  }, [state.currentRoom?.id]);
+  }, [state.currentRoom?.id, actions]);
 
   // Oda kopyalama
   const copyRoomCode = async () => {
@@ -34,7 +34,7 @@ export function GameRoom() {
 
     try {
       await startNewRound(state.currentRoom.id, 1);
-    } catch (error) {
+    } catch {
       // Hata durumunda UI'da gösterilecek
     }
   };
@@ -54,7 +54,7 @@ export function GameRoom() {
       );
       setAnswer('');
       dispatch({ type: 'SET_GAME_PHASE', payload: 'waiting' });
-    } catch (error) {
+    } catch {
       // Hata durumunda UI'da gösterilecek
     } finally {
       setSubmitting(false);
@@ -85,10 +85,10 @@ export function GameRoom() {
     if (state.timeLeft === 0 && state.gamePhase === 'answering') {
       // Eğer cevap verilmemişse boş cevap gönder
       if (!state.answers.find(a => a.player_id === state.currentPlayer?.id)) {
-        handleSubmitAnswer(new Event('submit') as any);
+        handleSubmitAnswer({ preventDefault: () => {} } as React.FormEvent);
       }
     }
-  }, [state.timeLeft, state.gamePhase]);
+  }, [state.timeLeft, state.gamePhase, state.answers, state.currentPlayer?.id, handleSubmitAnswer]);
 
   // Round sonuçlarını kontrol et
   useEffect(() => {
@@ -96,11 +96,7 @@ export function GameRoom() {
       calculateRoundResults(state.currentRound.id);
       dispatch({ type: 'SET_GAME_PHASE', payload: 'results' });
     }
-  }, [state.answers.length, state.currentRound?.status]);
-
-  const currentPlayerInRoom = state.roomPlayers.find(
-    rp => rp.player_id === state.currentPlayer?.id
-  );
+  }, [state.answers.length, state.currentRound?.status, state.currentRound?.id, dispatch]);
 
   const isRoomCreator = state.currentRoom?.created_by === state.currentPlayer?.id;
 
