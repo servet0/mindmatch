@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Copy, Crown, Timer, Users, Trophy, RotateCcw } from 'lucide-react';
 
 export function GameRoom() {
-  const { state, actions } = useGame();
+  const { state, actions, dispatch } = useGame();
   const [answer, setAnswer] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -35,7 +35,7 @@ export function GameRoom() {
     try {
       await startNewRound(state.currentRoom.id, 1);
     } catch (error) {
-      console.error('Oyun başlatılırken hata:', error);
+      // Hata durumunda UI'da gösterilecek
     }
   };
 
@@ -53,9 +53,9 @@ export function GameRoom() {
         answer.trim()
       );
       setAnswer('');
-      actions.dispatch({ type: 'SET_GAME_PHASE', payload: 'waiting' });
+      dispatch({ type: 'SET_GAME_PHASE', payload: 'waiting' });
     } catch (error) {
-      console.error('Cevap gönderilirken hata:', error);
+      // Hata durumunda UI'da gösterilecek
     } finally {
       setSubmitting(false);
     }
@@ -69,7 +69,7 @@ export function GameRoom() {
     
     if (nextRoundNumber > state.currentRoom.max_rounds) {
       await finishGame(state.currentRoom.id);
-      actions.dispatch({ type: 'SET_GAME_PHASE', payload: 'finished' });
+      dispatch({ type: 'SET_GAME_PHASE', payload: 'finished' });
     } else {
       await startNewRound(state.currentRoom.id, nextRoundNumber);
     }
@@ -94,15 +94,12 @@ export function GameRoom() {
   useEffect(() => {
     if (state.answers.length === 2 && state.currentRound?.status === 'active') {
       calculateRoundResults(state.currentRound.id);
-      actions.dispatch({ type: 'SET_GAME_PHASE', payload: 'results' });
+      dispatch({ type: 'SET_GAME_PHASE', payload: 'results' });
     }
   }, [state.answers.length, state.currentRound?.status]);
 
   const currentPlayerInRoom = state.roomPlayers.find(
     rp => rp.player_id === state.currentPlayer?.id
-  );
-  const otherPlayer = state.roomPlayers.find(
-    rp => rp.player_id !== state.currentPlayer?.id
   );
 
   const isRoomCreator = state.currentRoom?.created_by === state.currentPlayer?.id;
@@ -324,7 +321,7 @@ export function GameRoom() {
                               {answer.players?.nickname}
                             </div>
                             <div className="text-lg font-bold">
-                              "{answer.answer}"
+                              &quot;{answer.answer}&quot;
                             </div>
                           </div>
                           <div className="text-right">

@@ -1,4 +1,4 @@
-import { supabase, type Room, type RoomPlayer, type GameRound, type PlayerAnswer, type Category } from './supabase';
+import { supabase, type Category } from './supabase';
 
 // Rastgele oda kodu oluştur
 export function generateRoomCode(): string {

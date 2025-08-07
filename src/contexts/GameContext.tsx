@@ -123,7 +123,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
         dispatch({ type: 'SET_ROOM_PLAYERS', payload: roomPlayers || [] });
       } catch (error) {
-        console.error('Oda oyuncuları güncellenirken hata:', error);
         dispatch({ type: 'SET_ERROR', payload: 'Oda bilgileri güncellenemedi' });
       }
     },
