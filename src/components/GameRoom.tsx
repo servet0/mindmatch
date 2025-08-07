@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { startNewRound, submitAnswer, calculateRoundResults, finishGame } from '@/lib/game-utils';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,7 @@ export function GameRoom() {
 
     const unsubscribe = actions.subscribeToRoom(state.currentRoom.id);
     return unsubscribe;
-  }, [state.currentRoom?.id, actions]);
+  }, [state.currentRoom, actions]);
 
   // Oda kopyalama
   const copyRoomCode = async () => {
@@ -40,7 +40,7 @@ export function GameRoom() {
   };
 
   // Cevap gönderme
-  const handleSubmitAnswer = async (e: React.FormEvent) => {
+  const handleSubmitAnswer = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!state.currentRound || !state.currentPlayer || !answer.trim()) return;
 
@@ -59,7 +59,7 @@ export function GameRoom() {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [state.currentRound, state.currentPlayer, state.currentRoom, answer, dispatch]);
 
   // Sonraki round
   const handleNextRound = async () => {

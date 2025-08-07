@@ -122,7 +122,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         if (error) throw error;
 
         dispatch({ type: 'SET_ROOM_PLAYERS', payload: roomPlayers || [] });
-      } catch (error) {
+      } catch {
         dispatch({ type: 'SET_ERROR', payload: 'Oda bilgileri güncellenemedi' });
       }
     },
