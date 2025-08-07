@@ -188,7 +188,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
             table: 'player_answers',
             filter: `room_id=eq.${roomId}`,
           },
-          async (payload) => {
+          async () => {
             // Cevapları güncelle
             if (state.currentRound) {
               const { data: answers } = await supabase

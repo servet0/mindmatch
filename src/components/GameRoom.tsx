@@ -6,7 +6,7 @@ import { startNewRound, submitAnswer, calculateRoundResults, finishGame } from '
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Copy, Crown, Users, Trophy, RotateCcw, Home } from 'lucide-react';
+import { Copy, Crown, Users, Trophy, Home } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface GameRoomProps {
@@ -102,7 +102,7 @@ export function GameRoom({ roomId }: GameRoomProps = {}) {
       };
       loadRoom();
     }
-  }, [roomId, state.currentPlayer, state.currentRoom, actions, dispatch]);
+  }, [roomId, state.currentPlayer, state.currentRoom, state.currentRound, actions, dispatch]);
 
   // Oda subscription
   useEffect(() => {
@@ -454,7 +454,7 @@ export function GameRoom({ roomId }: GameRoomProps = {}) {
                   ) : (
                     <div className="text-center">
                       <p className="text-white/70 mb-4">
-                        Oda sahibinin sonraki round'u başlatmasını bekleyin...
+                        Oda sahibinin sonraki round&apos;u başlatmasını bekleyin...
                       </p>
                       <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto"></div>
                     </div>
