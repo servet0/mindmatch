@@ -10,7 +10,7 @@ https://github.com/user-attachments/assets/d784c92f-356e-4c96-99e3-c6894f418132
 
 **İki kişilik gerçek zamanlı kelime tahmin oyunu! Aynı kategori, anlık eşleşme, sonsuz eğlence.**
 
-[🎮 Demo](#) • [📖 Dokümantasyon](#kurulum) • [🚀 Deploy](#deploy)
+[🎮 Demo](mindmatch-eosin.vercel.app) • [📖 Dokümantasyon](#kurulum) • [🚀 Deploy](#deploy)
 
 </div>
 
