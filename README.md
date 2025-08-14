@@ -10,7 +10,11 @@ https://github.com/user-attachments/assets/d784c92f-356e-4c96-99e3-c6894f418132
 
 **Two-player real-time word guessing game! Same category, instant matching, endless fun.**
 
+<<<<<<< HEAD
 [🎮 Demo](#) • [📖 Documentation](#installation) • [🚀 Deploy](#deploy)
+=======
+[🎮 Demo](https://mindmatch-eosin.vercel.app) • [📖 Dokümantasyon](#kurulum) • [🚀 Deploy](#deploy)
+>>>>>>> 15e956726add986588880b74b56253b2760891d3
 
 </div>
 
