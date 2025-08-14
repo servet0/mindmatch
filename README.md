@@ -1,38 +1,38 @@
-# 🧠 MindMatch - Gerçek Zamanlı Kelime Tahmin Oyunu
+# 🧠 MindMatch - Real-time Word Guessing Game
 https://github.com/user-attachments/assets/d784c92f-356e-4c96-99e3-c6894f418132
 <div align="center">
 
-![MindMatch](https://img.shields.io/badge/MindMatch-Kelime%20Oyunu-purple?style=for-the-badge)
+![MindMatch](https://img.shields.io/badge/MindMatch-Word%20Game-purple?style=for-the-badge)
 ![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-blue?style=for-the-badge&logo=typescript)
 ![Supabase](https://img.shields.io/badge/Supabase-green?style=for-the-badge&logo=supabase)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-38B2AC?style=for-the-badge&logo=tailwind-css)
 
-**İki kişilik gerçek zamanlı kelime tahmin oyunu! Aynı kategori, anlık eşleşme, sonsuz eğlence.**
+**Two-player real-time word guessing game! Same category, instant matching, endless fun.**
 
-[🎮 Demo](#) • [📖 Dokümantasyon](#kurulum) • [🚀 Deploy](#deploy)
+[🎮 Demo](#) • [📖 Documentation](#installation) • [🚀 Deploy](#deploy)
 
 </div>
 
 ---
 
-## ✨ Özellikler
+## ✨ Features
 
-### 🎯 Oyun Mechanics
-- **Gerçek Zamanlı Multiplayer**: İki oyuncu anlık olarak oynayabilir
-- **Kategori Tabanlı**: 10 farklı kelime kategorisi (Hayvanlar, Yemekler, Şehirler vb.)
-- **Akıllı Puanlama**: Aynı kelime 2 puan, farklı kelime 1 puan
-- **Instant Feedback**: Karşı taraf yazdığında hemen devam eder
-- **5 Round Sistem**: Kısa ve heyecanlı oyun seansları
+### 🎯 Game Mechanics
+- **Real-time Multiplayer**: Two players can play instantly
+- **Category-based**: 10 different word categories (Animals, Food, Cities, etc.)
+- **Smart Scoring**: Same word 2 points, different word 1 point
+- **Instant Feedback**: Continues immediately when the other player types
+- **5 Round System**: Short and exciting game sessions
 
-### 🌐 Teknik Özellikler
-- **URL Persistence**: Sayfa yenilense bile oyun devam eder
-- **LocalStorage**: Oyuncu bilgileri korunur
-- **Real-time Sync**: Supabase Realtime ile anlık senkronizasyon
-- **Responsive Design**: Mobil ve masaüstü uyumlu
-- **Modern UI**: Glassmorphism tasarım ve gradient arka planlar
+### 🌐 Technical Features
+- **URL Persistence**: Game continues even when page is refreshed
+- **LocalStorage**: Player information is preserved
+- **Real-time Sync**: Instant synchronization with Supabase Realtime
+- **Responsive Design**: Mobile and desktop compatible
+- **Modern UI**: Glassmorphism design and gradient backgrounds
 
-### 🛠️ Teknolojiler
+### 🛠️ Technologies
 - **Frontend**: Next.js 15, TypeScript, React 19
 - **Styling**: Tailwind CSS, Custom CSS Animations
 - **Database**: Supabase PostgreSQL
@@ -42,114 +42,114 @@ https://github.com/user-attachments/assets/d784c92f-356e-4c96-99e3-c6894f418132
 
 ---
 
-## 🎮 Nasıl Oynanır?
+## 🎮 How to Play?
 
-### 1. Oda Oluştur veya Katıl
-- **Oda Oluştur**: Nickname gir ve "Oda Oluştur" butonuna tıkla
-- **Odaya Katıl**: Nickname ve 6 haneli oda kodunu gir
+### 1. Create or Join a Room
+- **Create Room**: Enter nickname and click "Create Room" button
+- **Join Room**: Enter nickname and 6-digit room code
 
-### 2. Oyun Başlar
-- Her round'da aynı kategori gösterilir
-- İki oyuncu da kategori ile ilgili bir kelime yazar
-- Kelimeni yazıp "Cevabı Gönder" butonuna tıkla
+### 2. Game Starts
+- Same category is shown each round
+- Both players write a word related to the category
+- Type your word and click "Submit Answer" button
 
-### 3. Puanlama
-- **Aynı kelime**: Her iki oyuncu 2 puan alır 🎉
-- **Farklı kelime**: Her iki oyuncu 1 puan alır ⚡
-- 5 round sonunda en yüksek skor kazanır! 🏆
+### 3. Scoring
+- **Same word**: Both players get 2 points 🎉
+- **Different word**: Both players get 1 point ⚡
+- Highest score wins after 5 rounds! 🏆
 
 ---
 
-## 🚀 Kurulum
+## 🚀 Installation
 
-### Ön Koşullar
-- **Node.js** 18+ (Next.js çalıştırmak için gerekli)
-- **npm** veya **yarn** (paket yöneticisi)
-- **Supabase** hesabı (veritabanı için)
+### Prerequisites
+- **Node.js** 18+ (required to run Next.js)
+- **npm** or **yarn** (package manager)
+- **Supabase** account (for database)
 
-### 1. Projeyi Klonla
+### 1. Clone the Project
 ```bash
 git clone https://github.com/yourusername/mindmatch.git
 cd mindmatch
 ```
 
-### 2. Bağımlılıkları Kur
+### 2. Install Dependencies
 ```bash
 npm install
 ```
 
-### 3. Supabase Kurulumu
+### 3. Supabase Setup
 
-#### Supabase Projesi Oluştur
-1. [Supabase](https://supabase.com) hesabı oluştur
-2. Yeni proje oluştur
-3. Region olarak **Europe West (eu-west-1)** seç (Türkiye için optimal)
+#### Create Supabase Project
+1. Create [Supabase](https://supabase.com) account
+2. Create new project
+3. Select **Europe West (eu-west-1)** as region (optimal for Turkey)
 
-#### Veritabanı Şemasını Kur
+#### Setup Database Schema
 1. Supabase Dashboard → **SQL Editor**
-2. `supabase_schema.sql` dosyasının içeriğini kopyala ve çalıştır
+2. Copy and run the contents of `supabase_schema.sql` file
 
-#### API Anahtarlarını Al
+#### Get API Keys
 1. Supabase Dashboard → **Settings** → **API**
-2. **Project URL** ve **anon public key**'i kopyala
+2. Copy **Project URL** and **anon public key**
 
 ### 4. Environment Variables
-`.env.local` dosyası oluştur:
+Create `.env.local` file:
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-### 5. Uygulamayı Çalıştır
+### 5. Run the Application
 ```bash
 npm run dev
 ```
 
-Uygulama `http://localhost:3000` adresinde çalışacak! 🎉
+Application will run at `http://localhost:3000`! 🎉
 
 ---
 
-## 📁 Proje Yapısı
+## 📁 Project Structure
 
 ```
 mindmatch/
 ├── src/
 │   ├── app/
-│   │   ├── room/[roomId]/       # Dinamik oda sayfaları
-│   │   ├── page.tsx             # Ana sayfa
+│   │   ├── room/[roomId]/       # Dynamic room pages
+│   │   ├── page.tsx             # Main page
 │   │   ├── layout.tsx           # Root layout
-│   │   └── globals.css          # Global stiller
+│   │   └── globals.css          # Global styles
 │   ├── components/
-│   │   ├── HomePage.tsx         # Ana sayfa bileşeni
-│   │   ├── GameRoom.tsx         # Oyun odası bileşeni
-│   │   └── ui/                  # UI bileşenleri
+│   │   ├── HomePage.tsx         # Home page component
+│   │   ├── GameRoom.tsx         # Game room component
+│   │   └── ui/                  # UI components
 │   ├── contexts/
-│   │   └── GameContext.tsx      # Oyun state yönetimi
+│   │   └── GameContext.tsx      # Game state management
 │   ├── lib/
 │   │   ├── supabase.ts          # Supabase client
-│   │   ├── game-utils.ts        # Oyun fonksiyonları
-│   │   └── utils.ts             # Yardımcı fonksiyonlar
-├── supabase_schema.sql          # Veritabanı şeması
-├── SETUP.md                     # Detaylı kurulum rehberi
-└── README.md                    # Bu dosya
+│   │   ├── game-utils.ts        # Game functions
+│   │   └── utils.ts             # Helper functions
+├── supabase_schema.sql          # Database schema
+├── SETUP.md                     # Detailed setup guide
+└── README.md                    # This file
 ```
 
 ---
 
-## 🗄️ Veritabanı Şeması
+## 🗄️ Database Schema
 
-### Tablolar
-- **players**: Oyuncu bilgileri ve istatistikleri
-- **rooms**: Oyun odaları ve durumları
-- **room_players**: Oyuncu-oda ilişkileri ve skorlar
-- **categories**: Kelime kategorileri
-- **game_rounds**: Oyun round'ları ve kategoriler
-- **player_answers**: Oyuncu cevapları ve puanları
+### Tables
+- **players**: Player information and statistics
+- **rooms**: Game rooms and statuses
+- **room_players**: Player-room relationships and scores
+- **categories**: Word categories
+- **game_rounds**: Game rounds and categories
+- **player_answers**: Player answers and points
 
-### Özellikler
-- **Row Level Security (RLS)**: Güvenli veri erişimi
-- **Real-time Subscriptions**: Anlık veri senkronizasyonu
-- **Optimized Indexes**: Hızlı sorgular
+### Features
+- **Row Level Security (RLS)**: Secure data access
+- **Real-time Subscriptions**: Instant data synchronization
+- **Optimized Indexes**: Fast queries
 
 ---
 
@@ -172,48 +172,48 @@ vercel --prod
 ```
 
 ### Environment Variables (Production)
-Vercel Dashboard'da şu değişkenleri ekle:
+Add these variables in Vercel Dashboard:
 - `NEXT_PUBLIC_SUPABASE_URL`: Supabase Project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase Anon Key
 
 ---
 
-## 🎨 UI/UX Özellikleri
+## 🎨 UI/UX Features
 
-### Tasarım Sistemi
-- **Gradient Backgrounds**: Modern gradient arka planlar
-- **Glassmorphism**: Şeffaf cam efektli kartlar
-- **Responsive Layout**: Mobil-first tasarım
-- **Smooth Animations**: CSS transitions ve animations
-- **Dark Theme**: Göz yormayan karanlık tema
+### Design System
+- **Gradient Backgrounds**: Modern gradient backgrounds
+- **Glassmorphism**: Transparent glass effect cards
+- **Responsive Layout**: Mobile-first design
+- **Smooth Animations**: CSS transitions and animations
+- **Dark Theme**: Eye-friendly dark theme
 
-### İnteraktif Elementler
-- **Real-time Status**: Canlı oyuncu durumları
-- **Loading States**: Akıllı yükleme göstergeleri
-- **Error Handling**: Kullanıcı dostu hata mesajları
-- **Success Feedback**: Başarı animasyonları
+### Interactive Elements
+- **Real-time Status**: Live player statuses
+- **Loading States**: Smart loading indicators
+- **Error Handling**: User-friendly error messages
+- **Success Feedback**: Success animations
 
 ---
 
-## 🧪 Geliştirme
+## 🧪 Development
 
 ### Scripts
 ```bash
-npm run dev          # Geliştirme sunucusu
+npm run dev          # Development server
 npm run build        # Production build
-npm run start        # Production sunucusu
-npm run lint         # ESLint kontrolü
+npm run start        # Production server
+npm run lint         # ESLint check
 ```
 
-### Kod Kalitesi
-- **TypeScript**: Tip güvenliği
-- **ESLint**: Kod standartları
-- **Prettier**: Kod formatlaması
+### Code Quality
+- **TypeScript**: Type safety
+- **ESLint**: Code standards
+- **Prettier**: Code formatting
 - **React Hooks**: Modern React patterns
 
 ---
 
-## 🤝 Katkıda Bulunma
+## 🤝 Contributing
 
 1. Fork the project
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -223,13 +223,13 @@ npm run lint         # ESLint kontrolü
 
 ---
 
-## 📝 Lisans
+## 📝 License
 
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakınız.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 👥 Yaratıcı
+## 👥 Creator
 
 **MindMatch Team**
 - 🌐 Website: [mindmatch.vercel.app](#)
@@ -238,7 +238,7 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICE
 
 ---
 
-## 🙏 Teşekkürler
+## 🙏 Acknowledgments
 
 - [Next.js](https://nextjs.org/) - React framework
 - [Supabase](https://supabase.com/) - Backend as a Service
@@ -250,7 +250,7 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICE
 
 <div align="center">
 
-**⭐ Projeyi beğendiyseniz yıldız vermeyi unutmayın! ⭐**
+**⭐ Don't forget to give the project a star if you liked it! ⭐**
 
 Made with ❤️ for word game lovers
 
